@@ -6,7 +6,7 @@ import time
 from urllib.parse import urlparse
 
 # --- CONFIGURATION constants ---
-BASE_URL = "http://localhost:5000/v1" 
+BASE_URL = "https://starter-kit-restapi-express.vercel.app/v1"
 CONFIG_FILE_BASE = "secrets.json"
 
 # --- HELPER: Config Management (Secrets) ---
