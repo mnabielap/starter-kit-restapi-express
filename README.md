@@ -224,17 +224,17 @@ No arguments needed. Just run the file.
 
 1.  **Register Admin:** (Creates user & saves token)
     ```bash
-    python api_tests/auth_register.py
+    python api_tests/A1.auth_register.py
     ```
 
 2.  **Create Secondary User:** (Uses Admin token to create another user)
     ```bash
-    python api_tests/user_create.py
+    python api_tests/B1.user_create.py
     ```
 
 3.  **Get All Users:**
     ```bash
-    python api_tests/user_get_all.py
+    python api_tests/B2.user_get_all.py
     ```
 
 > **Note:** The `utils.py` script generates detailed logs for every request in `*.json` files within the `api_tests/` folder.
