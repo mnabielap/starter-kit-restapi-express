@@ -51,8 +51,6 @@ export const saveToken = async (token: string, userId: number, expires: moment.M
 export const verifyToken = async (token: string, type: string): Promise<Token> => {
   const payload = jwt.verify(token, config.jwt.secret) as JwtPayload;
   
-  // Fix: TypeScript defines 'sub' as string | undefined. 
-  // We explicitly convert it to Number because our DB uses numbers for IDs.
   const userId = Number(payload.sub);
 
   if (isNaN(userId)) {

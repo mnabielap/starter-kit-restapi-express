@@ -11,7 +11,7 @@ const startServer = async () => {
     await db.raw('SELECT 1+1 as result');
     logger.info(`Connected to Database (${config.db.client})`);
 
-    // Run Migrations (Optional: typically run via command line, but can be auto-run here)
+    // Run Migrations
     if (config.env === 'development') {
       await db.migrate.latest();
       logger.info('Migrations are up to date');
