@@ -21,6 +21,8 @@ export const getUsers = z.object({
     sortBy: z.string().optional(),
     limit: z.coerce.number().int().min(1).optional(),
     page: z.coerce.number().int().min(1).optional(),
+    search: z.string().optional(),
+    scope: z.enum(['all', 'name', 'email', 'id']).optional(),
   }),
 });
 
@@ -36,7 +38,7 @@ export const updateUser = z.object({
     name: z.string().optional(),
     role: z.enum(['user', 'admin']).optional(),
   })
-  .strict() // Ensures no unknown fields are passed
+  .strict()
   .refine((data) => Object.keys(data).length > 0, {
     message: 'Update body must have at least one field',
   }),

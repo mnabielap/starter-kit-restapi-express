@@ -37,14 +37,18 @@ export const auth = (...requiredRights: string[]) => async (req: Request, res: R
         const userRights = roleRights.get(user.role) || [];
         const hasRequiredRights = requiredRights.every((right) => userRights.includes(right));
         
-        if (!hasRequiredRights && req.params.userId !== String(user.id)) {
+        if (!hasRequiredRights) {
           throw new ApiError(httpStatus.FORBIDDEN, 'Forbidden');
         }
       }
 
       resolve(next());
     } catch (err) {
-      reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+      if (err instanceof ApiError) {
+        reject(err);
+      } else {
+        reject(new ApiError(httpStatus.UNAUTHORIZED, 'Please authenticate'));
+      }
     }
   })
   .catch((err) => next(err));

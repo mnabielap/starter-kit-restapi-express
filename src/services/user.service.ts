@@ -57,15 +57,45 @@ export const getUserByEmail = async (email: string): Promise<User | undefined> =
  * Query users
  */
 export const queryUsers = async (filter: any, options: any): Promise<PaginatedResult<Omit<User, 'password'>>> => {
-  const { name, role } = filter;
+  const { name, role, search, scope } = filter;
   const { sortBy, limit = 10, page = 1 } = options;
   const offset = (page - 1) * limit;
 
   // Base Query
   const query = db('users').select('id', 'name', 'email', 'role', 'is_email_verified', 'created_at');
 
-  if (name) query.where('name', 'like', `%${name}%`);
-  if (role) query.where({ role });
+  // Handle Role Filter
+  if (role) {
+    query.where({ role });
+  }
+
+  // Handle Search and Scope
+  if (search) {
+    const searchTerm = `%${search}%`;
+
+    if (scope === 'name') {
+      query.where('name', 'like', searchTerm);
+    } else if (scope === 'email') {
+      query.where('email', 'like', searchTerm);
+    } else if (scope === 'id') {
+      // Precise match for ID
+      query.where('id', search);
+    } else {
+      // Scope 'all' (or undefined)
+      query.where((builder) => {
+        builder.where('name', 'like', searchTerm)
+               .orWhere('email', 'like', searchTerm);
+        
+        // Only attempt to search by ID if the search string is a valid number
+        if (!isNaN(Number(search))) {
+          builder.orWhere('id', search);
+        }
+      });
+    }
+  } else if (name) {
+    // Legacy support for 'name' query param if 'search' is not provided
+    query.where('name', 'like', `%${name}%`);
+  }
 
   // Count Query (Cloning to avoid modifying main query)
   const countQuery = query.clone().clearSelect().count<{ count: number }[]>('* as count').first();
@@ -75,7 +105,10 @@ export const queryUsers = async (filter: any, options: any): Promise<PaginatedRe
   // Sorting
   if (sortBy) {
     const [field, order] = sortBy.split(':');
-    if (['asc', 'desc'].includes(order) && ['name', 'role', 'created_at'].includes(field)) {
+    // Allowed sort fields
+    const allowedSortFields = ['id', 'name', 'email', 'role', 'created_at'];
+    
+    if (['asc', 'desc'].includes(order) && allowedSortFields.includes(field)) {
       query.orderBy(field, order);
     }
   } else {
